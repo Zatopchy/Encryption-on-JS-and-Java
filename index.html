@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Encoding on JS!</title>
+    <script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script src="jsencrypt/bin/jsencrypt.min.js"></script>
+    <script src="cryptojs/aes.js"></script>
+</head>
+<body>
+<input
+        type="button"
+        value="Begin encoding content"
+        onclick="BeginEncode()"
+/><br/>
+<script type="text/javascript">
+      // Reading file with public key
+      let readFile = async (file) => {
+        var response = await fetch(file),
+          text = await response.text();
+        console.log(text);
+        return text;
+      };
+      // Content encoding
+      let encryptWithRSA = (encodedContent, aesKey) => {
+        new Promise(function (resolve) {
+          var pubKey = readFile("RSA/publicKey");
+          resolve(pubKey);
+        }).then(function (pubKey) {
+          let RSAEncrypt = new JSEncrypt();
+          console.log(pubKey);
+          RSAEncrypt.setPublicKey(pubKey);
+          let encryptedAESKey = RSAEncrypt.encrypt(aesKey);
+          // Link to download a file with encoded content
+          document.write(
+            '<a href="data:text/plain;charset=utf-8,%EF%BB%BF' +
+              encodeURIComponent(encryptedAESKey) +
+              '" download="aes_key.txt">aes_key.txt</a>'
+          );
+          document.write(
+            '<a href="data:text/plain;charset=utf-8,%EF%BB%BF' +
+              encodeURIComponent(encodedContent) +
+              '" download="content.txt">content.txt</a>'
+          );
+        });
+      };
+      // Creating Hexadecimal String
+      let generateHexString = (length) => {
+        var hexString = "";
+        while (hexString.length < length) {
+          hexString += Math.random().toString(16).substring(2);
+        }
+        return hexString.substring(0, length);
+      };
+      // Encrypting content with aes
+      let encryptWithAES = (message = "", key = "") => {
+        var message = CryptoJS.AES.encrypt(message, key);
+        return message.toString();
+      };
+      // Decrypting content with aes
+      let decryptWithAES = (message = "", key = "") => {
+        var code = CryptoJS.AES.decrypt(message, key);
+        var decryptedMessage = code.toString(CryptoJS.enc.Utf8);
+
+        return decryptedMessage;
+      };
+      // Start of the program
+      let BeginEncode = () => {
+        var aesKey = generateHexString(64);
+        var content =
+          "(текст-рыба) Каждый из нас понимает очевидную вещь: внедрение современных методик предопределяет высокую востребованность модели развития. Равным образом, укрепление и развитие внутренней структуры играет важную роль в формировании существующих финансовых и административных условий. Задача организации, в особенности же глубокий уровень погружения обеспечивает широкому кругу (специалистов) участие в формировании прогресса профессионального сообщества. Есть над чем задуматься: активно развивающиеся страны третьего мира и по сей день остаются уделом либералов, которые жаждут быть превращены в посмешище, хотя само их существование приносит несомненную пользу обществу. С другой стороны, укрепление и развитие внутренней структуры однозначно определяет каждого участника как способного принимать собственные решения касаемо инновационных методов управления процессами. Имеется спорная точка зрения, гласящая примерно следующее: базовые сценарии поведения пользователей формируют глобальную экономическую сеть и при этом - преданы социально-демократической анафеме. Следует отметить, что начало повседневной работы по формированию позиции говорит о возможностях системы обучения кадров, соответствующей насущным потребностям. Учитывая ключевые сценарии поведения, убеждённость некоторых оппонентов создаёт предпосылки для стандартных подходов. В рамках спецификации современных стандартов, интерактивные прототипы представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть объективно рассмотрены соответствующими инстанциями.";
+        console.log("Hex key: " + aesKey);
+        var encodedContent = encryptWithAES(content, aesKey);
+        console.log("Encrypted: " + encodedContent);
+        encryptWithRSA(encodedContent, aesKey);
+      };
+
+
+</script>
+</body>
+</html>
